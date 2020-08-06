@@ -356,7 +356,8 @@ const int jhdLen = strlen(JHEADER);
 void handleJPG(void)
 {
   WiFiClient client = server.client();
-
+  
+  cam.run();
   if (!client.connected()) return;
   client.write(JHEADER, jhdLen);
   client.write((char*)cam.getfb(), cam.getSize());
