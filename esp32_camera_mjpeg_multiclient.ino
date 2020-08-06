@@ -357,8 +357,8 @@ void handleJPG(void)
 {
   WiFiClient client = server.client();
   
-  cam.run();
   if (!client.connected()) return;
+  cam.run();
   client.write(JHEADER, jhdLen);
   client.write((char*)cam.getfb(), cam.getSize());
 }
