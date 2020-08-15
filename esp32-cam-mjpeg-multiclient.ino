@@ -1,4 +1,4 @@
-/*
+/**
 
   This is a simple MJPEG streaming webserver implemented for AI-Thinker ESP32-CAM
   and ESP-EYE modules.
@@ -18,9 +18,11 @@
    Flash Size: 4Mb
    Patrition: Minimal SPIFFS
    PSRAM: Enabled
-*/
 
-// ESP32 has two cores: APPlication core and PROcess core (the one that runs ESP32 SDK stack)
+**/
+
+// ESP32 has two cores: APPlication core and
+// Process core (the one that runs ESP32 SDK stack)
 #define APP_CPU 1
 #define PRO_CPU 0
 
@@ -34,28 +36,24 @@
 #include <esp_sleep.h>
 #include <driver/rtc_io.h>
 
-// Select camera model
-//#define CAMERA_MODEL_WROVER_KIT
-#define CAMERA_MODEL_ESP_EYE
-//#define CAMERA_MODEL_M5STACK_PSRAM
-//#define CAMERA_MODEL_M5STACK_WIDE
-//#define CAMERA_MODEL_AI_THINKER
+/* == Brownout Handler ==*/
+#include "soc/soc.h"
+#include "soc/rtc_cntl_reg.h"
 
-#include "camera_pins.h"
+/**
 
-/*
   Next one is an include with wifi credentials.
   This is what you need to do:
 
-  1. Create a file called "home_wifi_multi.h" in the same folder   OR   under a separate subfolder of the "libraries" folder of Arduino IDE. (You are creating a "fake" library really - I called it "MySettings").
-  2. Place the following text in the file:
-  #define SSID1 "replace with your wifi ssid"
-  #define PWD1 "replace your wifi password"
+  1. Copy the file `settings.h.example` to `settings.h`
+  2. Change the values to their proper defaults (wifi and camera)
   3. Save.
 
   Should work then
-*/
-#include "home_wifi_multi.h"
+
+**/
+#include "settings.h"
+#include "camera_pins.h"
 
 OV2640 cam;
 
@@ -387,7 +385,8 @@ void setup()
 
   // Setup Serial connection:
   Serial.begin(115200);
-  delay(1000); // wait for a second to let Serial connect
+  // wait for a second to let Serial connect
+  delay(1000);
 
 
   // Configure the camera
@@ -432,6 +431,8 @@ void setup()
     ESP.restart();
   }
 
+  // disable brownout detector
+  WRITE_PERI_REG(RTC_CNTL_BROWN_OUT_REG, 0);
 
   //  Configure and connect to WiFi
   IPAddress ip;
@@ -450,6 +451,9 @@ void setup()
   Serial.print("Stream Link: http://");
   Serial.print(ip);
   Serial.println("/mjpeg/1");
+
+  // enable brownout detector
+  WRITE_PERI_REG(RTC_CNTL_BROWN_OUT_REG, 1);
 
 
   // Start mainstreaming RTOS task
