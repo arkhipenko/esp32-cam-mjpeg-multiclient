@@ -359,9 +359,10 @@ void handleJPG(void)
   WiFiClient client = server.client();
 
   if (!client.connected()) return;
-  cam.run();
+  xSemaphoreTake( frameSync, portMAX_DELAY );
   client.write(JHEADER, jhdLen);
-  client.write((char*)cam.getfb(), cam.getSize());
+  client.write((char*) camBuf, (size_t)camSize);
+  xSemaphoreGive( frameSync );
 }
 
 
